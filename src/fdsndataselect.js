@@ -28,6 +28,9 @@ export class DataSelectQuery {
   host(value) {
     return arguments.length ? (this._host = value, this) : this._host;
   }
+  nodata(value) {
+    return arguments.length ? (this._nodata = value, this) : this._nodata;
+  }
   networkCode(value) {
     return arguments.length ? (this._networkCode = value, this) : this._networkCode;
   }
@@ -84,8 +87,13 @@ console.log("fdsnDataSelect URL: "+url);
       function handler() {
         if (this.readyState === this.DONE) {
           if (this.status === 200) { 
-            resolve(this.response); }
-          else { reject(this); }
+            resolve(this.response); 
+          } else if (this.status === 204) { 
+            // no data, so resolve success but with empty array
+            resolve( new ArrayBuffer(0) ); 
+          } else { 
+            reject(this); 
+          }
         }
       }
     });
@@ -123,6 +131,10 @@ console.log("fdsnDataSelect URL: "+url);
     return promise;
   }
 
+  makeParam(name, val) {
+    return name+"="+encodeURIComponent(val)+"&";
+  }
+
   formURL() {
 console.log("in fdsn-station formURL()");
     let colon = ":";
@@ -130,18 +142,23 @@ console.log("in fdsn-station formURL()");
       colon = "";
     }
     let url = this.protocol()+colon+"//"+this.host()+"/fdsnws/dataselect/1/query?";
-    if (this._networkCode) { url = url+"net="+this.networkCode()+"&";}
-    if (this._stationCode) { url = url+"sta="+this.stationCode()+"&";}
-    if (this._locationCode) { url = url+"loc="+this.locationCode()+"&";}
-    if (this._channelCode) { url = url+"cha="+this.channelCode()+"&";}
-    if (this._startTime) { url = url+"starttime="+this.toIsoWoZ(this.startTime())+"&";}
-    if (this._endTime) { url = url+"endtime="+this.toIsoWoZ(this.endTime())+"&";}
-    if (this._quality) { url = url+"quality="+this.quality()+"&";}
-    if (this._minimumLength) { url = url+"minimumlength="+this.minimumLength()+"&";}
-    if (this._repository) { url = url+"repository="+this.repository()+"&";}
-    if (this._longestOnly) { url = url+"longestonly="+this.longestOnly()+"&";}
-    if (this._format) { url = url+"format="+this.format()+"&";}
-    return url.substr(0, url.length-1); // zap last & or ?
+    if (this._networkCode) { url = url+this.makeParam("net", this.networkCode());}
+    if (this._stationCode) { url = url+this.makeParam("sta", this.stationCode());}
+    if (this._locationCode) { url = url+this.makeParam("loc", this.locationCode());}
+    if (this._channelCode) { url = url+this.makeParam("cha", this.channelCode());}
+    if (this._startTime) { url = url+this.makeParam("starttime", this.toIsoWoZ(this.startTime()));}
+    if (this._endTime) { url = url+this.makeParam("endtime", this.toIsoWoZ(this.endTime()));}
+    if (this._quality) { url = url+this.makeParam("quality", this.quality());}
+    if (this._minimumLength) { url = url+this.makeParam("minimumlength", this.minimumLength());}
+    if (this._repository) { url = url+this.makeParam("repository", this.repository());}
+    if (this._longestOnly) { url = url+this.makeParam("longestonly", this.longestOnly());}
+    if (this._format) { url = url+this.makeParam("format", this.format());}
+    if (this._nodata) { url = url+this.makeParam("nodata", this.nodata());}
+
+    if (url.endsWith('&') || url.endsWith('?')) {
+      url = url.substr(0, url.length-1); // zap last & or ?
+    }
+    return url;
   }
 
   // these are similar methods as in seisplotjs-fdsnevent
