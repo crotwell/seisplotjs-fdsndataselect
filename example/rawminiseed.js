@@ -16,11 +16,12 @@ var dsQuery = new ds.DataSelectQuery()
   .endTime(new Date(Date.parse('2017-03-01T20:23:04Z')));
 
 var div = d3.select('div.miniseed');
-div.append('p');
+var divP = div.append('p');
+divP.text("URL: ");
 var url = dsQuery.formURL();
-div.append("a")
+divP.append("a")
     .attr("href", url)
-    .text("URL: "+url);
+    .text(url);
 
 dsQuery.query().then(function(records) {
 var table = d3.select("div.miniseed")
