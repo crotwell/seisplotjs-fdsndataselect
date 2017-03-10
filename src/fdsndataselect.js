@@ -64,6 +64,11 @@ export class DataSelectQuery {
   format(value) {
     return arguments.length ? (this._format = value, this) : this._format;
   }
+  computeStartEnd(start, end, duration, clockOffset) {
+    let se = calcStartEndDates(start, end, duration, clockOffset);
+    this.startTime(se.start);
+    this.endTime(se.end);
+  }
 
   query() {
     return this.queryRaw().then(function(rawBuffer) {
@@ -179,4 +184,43 @@ console.log("in fdsn-station formURL()");
   }
 
 }
+
+
+export function calcClockOffset(serverTime) {
+  return new Date().getTime() - serverTime.getTime();
+}
+
+/** 
+Any two of start, end and duration can be specified, or just duration which
+then assumes end is now.
+start and end are Date objects, duration is in seconds.
+clockOffset is the milliseconds that should be subtracted from the local time
+ to get real world time, ie local - UTC 
+ or new Date().getTime() - serverDate.getTime()
+ default is zero.
+*/
+export function calcStartEndDates(start, end, duration, clockOffset) {
+  let startDate;
+  let endDate;
+  if (clockOffset === undefined) {
+    clockOffset = 0;
+  }
+  if (start && end) {
+    startDate = new Date(start);
+    endDate = new Date(end);
+  } else if (start && duration) {
+    startDate = new Date(start);
+    endDate = new Date(startDate.getTime()+parseFloat(duration)*1000);
+  } else if (end && duration) {
+    endDate = new Date(end);
+    startDate = new Date(endDate.getTime()-parseFloat(duration)*1000);
+  } else if (duration) {
+    endDate = new Date(new Date().getTime()-clockOffset);
+    startDate = new Date(endDate.getTime()-parseFloat(duration)*1000);
+  } else {
+    throw "need some combination of start, end and duration";
+  }
+  return { "start": startDate, "end": endDate };
+}
+
 
