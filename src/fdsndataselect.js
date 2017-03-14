@@ -16,11 +16,15 @@ export const IRIS_HOST = "service.iris.edu";
 
 export class DataSelectQuery {
   constructor(host) {
+    this._specVersion = 1;
     this._protocol = 'http';
     this._host = host;
     if (! host) {
       this._host = IRIS_HOST;
     }
+  }
+  specVersion(value) {
+    return arguments.length ? (this._specVersion = value, this) : this._specVersion;
   }
   protocol(value) {
     return arguments.length ? (this._protocol = value, this) : this._protocol;
@@ -67,7 +71,7 @@ export class DataSelectQuery {
   computeStartEnd(start, end, duration, clockOffset) {
     let se = calcStartEndDates(start, end, duration, clockOffset);
     this.startTime(se.start);
-    this.endTime(se.end);
+    return this.endTime(se.end);
   }
 
   query() {
@@ -93,9 +97,11 @@ console.log("fdsnDataSelect URL: "+url);
         if (this.readyState === this.DONE) {
           if (this.status === 200) { 
             resolve(this.response); 
-          } else if (this.status === 204) { 
+          } else if (this.status === 204 || (mythis.nodata() && this.status === mythis.nodata())) { 
             // no data, so resolve success but with empty array
             resolve( new ArrayBuffer(0) ); 
+} else if (this.status === 204 || this.status === 404) {
+console.log("Oops, nodata check not working "+this.status);
           } else { 
             reject(this); 
           }
@@ -105,12 +111,16 @@ console.log("fdsnDataSelect URL: "+url);
     return promise;
   }
 
-  formVersionURL() {
+  formBaseURL() {
       let colon = ":";
       if (this.protocol().endsWith(colon)) {
         colon = "";
       }
-      return this.protocol()+colon+"//"+this.host()+"/fdsnws/dataselect/1/version";
+      return this.protocol()+colon+"//"+this.host()+"/fdsnws/dataselect/"+this.specVersion();
+  }
+
+  formVersionURL() {
+    return this.formBaseURL()+"/version";
   }
 
   queryVersion() {
@@ -141,12 +151,7 @@ console.log("fdsnDataSelect URL: "+url);
   }
 
   formURL() {
-console.log("in fdsn-station formURL()");
-    let colon = ":";
-    if (this.protocol().endsWith(colon)) {
-      colon = "";
-    }
-    let url = this.protocol()+colon+"//"+this.host()+"/fdsnws/dataselect/1/query?";
+    let url = this.formBaseURL()+"/query?";
     if (this._networkCode) { url = url+this.makeParam("net", this.networkCode());}
     if (this._stationCode) { url = url+this.makeParam("sta", this.stationCode());}
     if (this._locationCode) { url = url+this.makeParam("loc", this.locationCode());}
