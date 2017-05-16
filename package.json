@@ -1,11 +1,11 @@
 {
   "name": "seisplotjs-fdsndataselect",
-  "version": "0.0.1-SNAPSHOT",
+  "version": "1.0.0",
   "description": "Querying and parsing of output of FDSN DataSelect web service for seismograms.",
   "main": "./lib/fdsndataselect.js",
   "dependencies": {
     "rsvp": "^3.3.3",
-    "seisplotjs-miniseed": "^1.0.0"
+    "seisplotjs-miniseed": "^1.1.0"
   },
   "scripts": {
     "lint": "eslint 'src/*.js'",
