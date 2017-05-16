@@ -2,7 +2,7 @@
 Queries to and parsing output from FDSN DataSelect web service.
 
 
-Example:
+See example dir for an example.
 
 
 
