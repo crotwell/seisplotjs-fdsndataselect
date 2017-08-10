@@ -1,10 +1,10 @@
 {
   "name": "seisplotjs-fdsndataselect",
-  "version": "1.0.0",
+  "version": "1.0.1-SNAPSHOT",
   "description": "Querying and parsing of output of FDSN DataSelect web service for seismograms.",
   "main": "./lib/fdsndataselect.js",
   "dependencies": {
-    "rsvp": "^3.3.3",
+    "rsvp": "^4.0.1",
     "seisplotjs-miniseed": "^1.1.0"
   },
   "scripts": {
@@ -33,12 +33,14 @@
   },
   "homepage": "https://github.com/crotwell/seisplotjs-fdsndataselect",
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
     "babelify": "^7.3.0",
-    "eslint": "^3.11.1",
-    "eslint-config-standard": "^6.2.1",
-    "eslint-plugin-promise": "^3.4.0",
-    "eslint-plugin-standard": "^2.0.1"
+    "eslint": "^4.4.1",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
   }
 }
