@@ -5,8 +5,8 @@ RSVP.on('error', function(reason) {
   console.assert(false, reason);
 });
 
-import * as model from 'seisplotjs-model';
 import * as miniseed from 'seisplotjs-miniseed';
+let model = miniseed.model;
 
 export { RSVP, model, miniseed };
 
