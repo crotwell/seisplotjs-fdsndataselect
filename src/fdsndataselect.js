@@ -6,7 +6,7 @@ RSVP.on('error', function(reason) {
 });
 
 import * as miniseed from 'seisplotjs-miniseed';
-let model = miniseed.model;
+const model = miniseed.model;
 
 export { RSVP, model, miniseed };
 
@@ -95,15 +95,15 @@ console.log("fdsnDataSelect URL: "+url);
 
       function handler() {
         if (this.readyState === this.DONE) {
-          if (this.status === 200) { 
-            resolve(this.response); 
-          } else if (this.status === 204 || (mythis.nodata() && this.status === mythis.nodata())) { 
+          if (this.status === 200) {
+            resolve(this.response);
+          } else if (this.status === 204 || (mythis.nodata() && this.status === mythis.nodata())) {
             // no data, so resolve success but with empty array
-            resolve( new ArrayBuffer(0) ); 
+            resolve( new ArrayBuffer(0) );
 } else if (this.status === 204 || this.status === 404) {
 console.log("Oops, nodata check not working "+this.status);
-          } else { 
-            reject(this); 
+          } else {
+            reject(this);
           }
         }
       }
@@ -181,7 +181,7 @@ console.log("Oops, nodata check not working "+this.status);
     return new Date(Date.parse(str));
   }
 
-  /** converts to ISO8601 but removes the trailing Z as FDSN web services 
+  /** converts to ISO8601 but removes the trailing Z as FDSN web services
     do not allow that. */
   toIsoWoZ(date) {
     let out = date.toISOString();
@@ -195,12 +195,12 @@ export function calcClockOffset(serverTime) {
   return new Date().getTime() - serverTime.getTime();
 }
 
-/** 
+/**
 Any two of start, end and duration can be specified, or just duration which
 then assumes end is now.
 start and end are Date objects, duration is in seconds.
 clockOffset is the milliseconds that should be subtracted from the local time
- to get real world time, ie local - UTC 
+ to get real world time, ie local - UTC
  or new Date().getTime() - serverDate.getTime()
  default is zero.
 */
@@ -227,5 +227,3 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
   }
   return { "start": startDate, "end": endDate };
 }
-
-
