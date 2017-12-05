@@ -225,3 +225,36 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
   }
   return { "start": startDate, "end": endDate };
 }
+
+export function createDataSelectQuery(params) {
+  if ( ! params || typeof params != 'object' ) {
+    throw new Error("params null or not an object");
+  }
+  let out = new DataSelectQuery();
+  if (params.net) { out.networkCode(params.net); }
+  if (params.network) { out.networkCode(params.network); }
+  if (params.networkCode) { out.networkCode(params.networkCode); }
+  if (params.sta) { out.stationCode(params.sta); }
+  if (params.station) { out.stationCode(params.station); }
+  if (params.stationCode) { out.stationCode(params.stationCode); }
+  if (params.loc) { out.locationCode(params.loc); }
+  if (params.location) { out.locationCode(params.location); }
+  if (params.locationCode) { out.locationCode(params.locationCode); }
+  if (params.chan) { out.channelCode(params.chan); }
+  if (params.channel) { out.channelCode(params.channel); }
+  if (params.channelCode) { out.channelCode(params.channelCode); }
+  if (params.start) { out.startTime(params.start); }
+  if (params.starttime) { out.startTime(params.starttime); }
+  if (params.end) { out.endTime(params.end); }
+  if (params.endtime) { out.endTime(params.endtime); }
+  if (params.quality) { out.quality(params.quality); }
+  if (params.minimumlength) { out.minimumLength(params.minimumlength); }
+  if (params.repository) { out.repository(params.repository); }
+  if (params.longestonly) { out.longestOnly(params.longestonly); }
+  if (params.format) { out.format(params.format); }
+  if (params.nodata) { out.nodata(params.nodata); }
+  if (params.host) { out.host(params.host); }
+  if (params.port) { out.port(params.port); }
+  if (params.specVersion) { out.specVersion(params.specVersion); }
+  return out;
+}
