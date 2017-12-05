@@ -48,10 +48,10 @@ export class DataSelectQuery {
     return arguments.length ? (this._channelCode = value, this) : this._channelCode;
   }
   startTime(value) {
-    return arguments.length ? (this._startTime = value, this) : this._startTime;
+    return arguments.length ? (this._startTime = model.checkStringOrDate(value), this) : this._startTime;
   }
   endTime(value) {
-    return arguments.length ? (this._endTime = value, this) : this._endTime;
+    return arguments.length ? (this._endTime = model.checkStringOrDate(value), this) : this._endTime;
   }
   quality(value) {
     return arguments.length ? (this._quality = value, this) : this._quality;
@@ -100,8 +100,6 @@ console.log("fdsnDataSelect URL: "+url);
           } else if (this.status === 204 || (mythis.nodata() && this.status === mythis.nodata())) {
             // no data, so resolve success but with empty array
             resolve( new ArrayBuffer(0) );
-} else if (this.status === 204 || this.status === 404) {
-console.log("Oops, nodata check not working "+this.status);
           } else {
             reject(this);
           }
@@ -136,10 +134,11 @@ console.log("Oops, nodata check not working "+this.status);
 
       function handler() {
         if (this.readyState === this.DONE) {
-          console.log("handle version: "+mythis.host()+" "+this.status);
-          if (this.status === 200) { resolve(this.response); }
-          else {
-            console.log("Reject version: "+mythis.host()+" "+this.status);reject(this); }
+          if (this.status === 200) {
+            resolve(this.response);
+          } else {
+            reject(this);
+          }
         }
       }
     });
@@ -174,12 +173,6 @@ console.log("Oops, nodata check not working "+this.status);
   // these are similar methods as in seisplotjs-fdsnevent
   // duplicate here to avoid dependency and diff NS, yes that is dumb...
 
-  toDateUTC(str) {
-    if (! str.endsWith('Z')) {
-      str = str + 'Z';
-    }
-    return new Date(Date.parse(str));
-  }
 
   /** converts to ISO8601 but removes the trailing Z as FDSN web services
     do not allow that. */
@@ -192,7 +185,7 @@ console.log("Oops, nodata check not working "+this.status);
 
 
 export function calcClockOffset(serverTime) {
-  return new Date().getTime() - serverTime.getTime();
+  return model.moment.utc().getTime() - serverTime.getTime();
 }
 
 /**
@@ -207,21 +200,26 @@ clockOffset is the milliseconds that should be subtracted from the local time
 export function calcStartEndDates(start, end, duration, clockOffset) {
   let startDate;
   let endDate;
-  if (clockOffset === undefined) {
-    clockOffset = 0;
+  if (duration && duration instanceof Number) {
+    duration = moment.duration(duration, 'seconds');
   }
   if (start && end) {
-    startDate = new Date(start);
-    endDate = new Date(end);
+    startDate = model.checkStringOrDate(start);
+    endDate = model.checkStringOrDate(end);
   } else if (start && duration) {
-    startDate = new Date(start);
-    endDate = new Date(startDate.getTime()+parseFloat(duration)*1000);
+    startDate = model.checkStringOrDate(start);
+    endDate = moment.utc(startDate).add(duration);
   } else if (end && duration) {
-    endDate = new Date(end);
-    startDate = new Date(endDate.getTime()-parseFloat(duration)*1000);
+    endDate = model.checkStringOrDate(end);
+    startDate = moment.utc(endDate).subtract(duration);
   } else if (duration) {
-    endDate = new Date(new Date().getTime()-clockOffset);
-    startDate = new Date(endDate.getTime()-parseFloat(duration)*1000);
+    if (clockOffset === undefined) {
+      clockOffset = moment.duration(0, 'seconds');
+    } else if (clockOffset instanceof Number) {
+      clockOffset = moment.duration(clockOffset, 'seconds');
+    }
+    endDate = moment.utc().subtract(clockOffset);
+    startDate = moment.utc(endDate).subtract(duration);
   } else {
     throw "need some combination of start, end and duration";
   }
