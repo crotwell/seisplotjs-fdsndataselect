@@ -9,6 +9,7 @@ import * as miniseed from 'seisplotjs-miniseed';
 const model = miniseed.model;
 
 export { RSVP, model, miniseed };
+const moment = model.moment;
 
 export const FORMAT_MINISEED = 'mseed';
 
@@ -185,7 +186,7 @@ console.log("fdsnDataSelect URL: "+url);
 
 
 export function calcClockOffset(serverTime) {
-  return model.moment.utc().getTime() - serverTime.getTime();
+  return moment.utc().getTime() - serverTime.getTime();
 }
 
 /**
