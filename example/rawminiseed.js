@@ -2,8 +2,6 @@
 // this comes from the seisplotjs miniseed bundle
 var ds = seisplotjs_fdsndataselect;
 var miniseed = ds.miniseed;
-// this comes from the seisplotjs waveformplot bundle
-//var wp = seisplotjs_waveformplot
 
 var dsQuery = new ds.DataSelectQuery()
   .host('service.scedc.caltech.edu')
@@ -86,4 +84,3 @@ var table = d3.select("div.miniseed")
   d3.select("div.miniseed").append('p').html("Error loading data." +error);
   console.assert(false, error);
 });
-
