@@ -201,7 +201,8 @@ clockOffset is the milliseconds that should be subtracted from the local time
 export function calcStartEndDates(start, end, duration, clockOffset) {
   let startDate;
   let endDate;
-  if (duration && duration instanceof Number) {
+  if (duration &&
+    (typeof duration == "number" || duration instanceof Number)) {
     duration = moment.duration(duration, 'seconds');
   }
   if (start && end) {
@@ -221,10 +222,11 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
     }
     endDate = moment.utc().subtract(clockOffset);
     startDate = moment.utc(endDate).subtract(duration);
+    console.log("duration: "+duration);
   } else {
     throw "need some combination of start, end and duration";
   }
-  return { "start": startDate, "end": endDate };
+  return { "start": startDate, "end": endDate, "duration": duration, "clockOffset": clockOffset };
 }
 
 export function createDataSelectQuery(params) {
