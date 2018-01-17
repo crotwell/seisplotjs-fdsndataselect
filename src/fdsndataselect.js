@@ -208,6 +208,7 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
   if (start && end) {
     startDate = model.checkStringOrDate(start);
     endDate = model.checkStringOrDate(end);
+    duration = endDate.from(startDate);
   } else if (start && duration) {
     startDate = model.checkStringOrDate(start);
     endDate = moment.utc(startDate).add(duration);
@@ -222,7 +223,6 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
     }
     endDate = moment.utc().subtract(clockOffset);
     startDate = moment.utc(endDate).subtract(duration);
-    console.log("duration: "+duration);
   } else {
     throw "need some combination of start, end and duration";
   }
