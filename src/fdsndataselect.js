@@ -202,6 +202,10 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
   let startDate;
   let endDate;
   if (duration &&
+    (typeof duration == "string" || duration instanceof String)) {
+      duration = Number.parseFloat(duration);
+  }
+  if (duration &&
     (typeof duration == "number" || duration instanceof Number)) {
     duration = moment.duration(duration, 'seconds');
   }
