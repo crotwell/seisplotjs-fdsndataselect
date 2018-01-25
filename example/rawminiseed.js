@@ -10,8 +10,8 @@ var dsQuery = new ds.DataSelectQuery()
   .stationCode('BBS')
   .locationCode('--')
   .channelCode('BHZ')
-  .startTime(new Date(Date.parse('2017-03-01T20:17:04Z')))
-  .endTime(new Date(Date.parse('2017-03-01T20:23:04Z')));
+  .startTime('2017-03-01T20:17:04Z')
+  .endTime('2017-03-01T20:23:04Z');
 
 var div = d3.select('div.miniseed');
 var divP = div.append('p');
