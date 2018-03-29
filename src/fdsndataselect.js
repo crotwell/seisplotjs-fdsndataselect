@@ -89,6 +89,10 @@ export class DataSelectQuery {
       let url = mythis.formURL();
 console.log("fdsnDataSelect URL: "+url);
       client.open("GET", url);
+      client.ontimeout = function(e) {
+        this.statusText = "Timeout "+this.statusText;
+        reject(this);
+      };
       client.onreadystatechange = handler;
       client.responseType = "arraybuffer";
       client.setRequestHeader("Accept", "application/vnd.fdsn.mseed");
