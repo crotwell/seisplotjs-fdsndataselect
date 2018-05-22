@@ -26,6 +26,7 @@ export class DataSelectQuery {
     if (! host) {
       this._host = IRIS_HOST;
     }
+    this._port = 80;
   }
   specVersion(value) {
     return arguments.length ? (this._specVersion = value, this) : this._specVersion;
@@ -35,6 +36,9 @@ export class DataSelectQuery {
   }
   host(value) {
     return arguments.length ? (this._host = value, this) : this._host;
+  }
+  port(value) {
+    return arguments.length ? (this._port = value, this) : this._port;
   }
   nodata(value) {
     return arguments.length ? (this._nodata = value, this) : this._nodata;
@@ -122,7 +126,7 @@ console.log("fdsnDataSelect URL: "+url);
       if (this.protocol().endsWith(colon)) {
         colon = "";
       }
-      return this.protocol()+colon+"//"+this.host()+"/fdsnws/dataselect/"+this.specVersion();
+      return this.protocol()+colon+"//"+this.host()+(this._port==80?"":(":"+this._port))+"/fdsnws/dataselect/"+this.specVersion();
   }
 
   formVersionURL() {
