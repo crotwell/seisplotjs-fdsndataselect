@@ -1,9 +1,13 @@
+// @flow
 
 import RSVP from 'rsvp';
 
 RSVP.on('error', function(reason) {
   console.assert(false, reason);
 });
+
+// special due to flow
+import {hasArgs, hasNoArgs, isStringArg, isNumArg, checkStringOrDate, stringify} from 'seisplotjs-model';
 
 import * as miniseed from 'seisplotjs-miniseed';
 const model = miniseed.model;
@@ -16,67 +20,212 @@ export const FORMAT_MINISEED = 'mseed';
 export const IRIS_HOST = "service.iris.edu";
 
 export class DataSelectQuery {
-  constructor(host) {
+  /** @private */
+  _specVersion: number;
+  /** @private */
+  _protocol: string;
+  /** @private */
+  _host: string;
+  /** @private */
+  _nodata: number;
+  /** @private */
+  _port: number;
+  /** @private */
+  _networkCode: string;
+  /** @private */
+  _stationCode: string;
+  /** @private */
+  _locationCode: string;
+  /** @private */
+  _channelCode: string;
+  /** @private */
+  _startTime: moment;
+  /** @private */
+  _endTime: moment;
+  /** @private */
+  _quality: string;
+  /** @private */
+  _minimumLength: number;
+  /** @private */
+  _longestOnly: boolean;
+  /** @private */
+  _repository: string;
+  /** @private */
+  _format: string;
+  constructor(host?: string) {
     this._specVersion = 1;
     this._protocol = 'http';
     if (document && document.location && "https:" == document.location.protocol) {
       this._protocol = 'https:'
     }
-    this._host = host;
-    if (! host) {
+    if (host) {
+      this._host = host;
+    } else {
       this._host = IRIS_HOST;
     }
     this._port = 80;
   }
-  specVersion(value) {
-    return arguments.length ? (this._specVersion = value, this) : this._specVersion;
+  specVersion(value?: number): number | DataSelectQuery {
+    if (hasArgs(value)) {
+      this._specVersion = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._specVersion;
+    } else {
+      throw new Error('value argument is optional or number, but was '+typeof value);
+    }
   }
-  protocol(value) {
-    return arguments.length ? (this._protocol = value, this) : this._protocol;
+  protocol(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._protocol = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._protocol;
+    } else {
+      throw new Error('value argument is optional or string, but was '+typeof value);
+    }
   }
-  host(value) {
-    return arguments.length ? (this._host = value, this) : this._host;
+  host(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._host = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._host;
+    } else {
+      throw new Error('value argument is optional or string, but was '+typeof value);
+    }
   }
-  port(value) {
-    return arguments.length ? (this._port = value, this) : this._port;
+  nodata(value?: number): number | DataSelectQuery {
+    if (hasNoArgs(value)) {
+      return this._nodata;
+    } else if (hasArgs(value)) {
+      this._nodata = value;
+      return this;
+    } else {
+      throw new Error('value argument is optional or number, but was '+typeof value);
+    }
   }
-  nodata(value) {
-    return arguments.length ? (this._nodata = value, this) : this._nodata;
+  port(value?: number): number | DataSelectQuery {
+    if (hasNoArgs(value)) {
+      return this._port;
+    } else if (hasArgs(value)) {
+      this._port = value;
+      return this;
+    } else {
+      throw new Error('value argument is optional or number, but was '+typeof value);
+    }
   }
-  networkCode(value) {
-    return arguments.length ? (this._networkCode = value, this) : this._networkCode;
+  networkCode(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._networkCode = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._networkCode;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  stationCode(value) {
-    return arguments.length ? (this._stationCode = value, this) : this._stationCode;
+  stationCode(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._stationCode = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._stationCode;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  locationCode(value) {
-    return arguments.length ? (this._locationCode = value, this) : this._locationCode;
+  locationCode(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._locationCode = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._locationCode;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  channelCode(value) {
-    return arguments.length ? (this._channelCode = value, this) : this._channelCode;
+  channelCode(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._channelCode = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._channelCode;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  startTime(value) {
-    return arguments.length ? (this._startTime = model.checkStringOrDate(value), this) : this._startTime;
+  startTime(value?: moment) :moment | DataSelectQuery {
+    if (hasNoArgs(value)) {
+      return this._startTime;
+    } else if (hasArgs(value)) {
+      this._startTime = checkStringOrDate(value);
+      return this;
+    } else {
+      throw new Error('value argument is optional or moment or string, but was '+typeof value);
+    }
   }
-  endTime(value) {
-    return arguments.length ? (this._endTime = model.checkStringOrDate(value), this) : this._endTime;
+  endTime(value?: moment) :moment | DataSelectQuery {
+    if (hasNoArgs(value)) {
+      return this._endTime;
+    } else if (hasArgs(value)) {
+      this._endTime = checkStringOrDate(value);
+      return this;
+    } else {
+      throw new Error('value argument is optional or moment or string, but was '+typeof value);
+    }
   }
-  quality(value) {
-    return arguments.length ? (this._quality = value, this) : this._quality;
+  quality(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._quality = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._quality;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  minimumLength(value) {
-    return arguments.length ? (this._minimumLength = value, this) : this._minimumLength;
+  minimumLength(value?: number): number | DataSelectQuery {
+    if (hasNoArgs(value)) {
+      return this._minimumLength;
+    } else if (hasArgs(value)) {
+      this._minimumLength = value;
+      return this;
+    } else {
+      throw new Error('value argument is optional or number, but was '+typeof value);
+    }
   }
-  longestOnly(value) {
-    return arguments.length ? (this._longestOnly = value, this) : this._longestOnly;
+  longestOnly(value?: boolean): boolean | DataSelectQuery {
+    if (hasNoArgs(value)) {
+      return this._longestOnly;
+    } else if (hasArgs(value)) {
+      this._longestOnly = value;
+      return this;
+    } else {
+      throw new Error('value argument is optional or boolean, but was '+typeof value);
+    }
   }
-  repository(value) {
-    return arguments.length ? (this._repository = value, this) : this._repository;
+  repository(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._repository = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._repository;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  format(value) {
-    return arguments.length ? (this._format = value, this) : this._format;
+  format(value?: string) :string | DataSelectQuery {
+    if (isStringArg(value)) {
+      this._format = value;
+      return this;
+    } else if (hasNoArgs(value)) {
+      return this._format;
+    } else {
+      throw new Error('value argument is optional or string, but was '+value);
+    }
   }
-  computeStartEnd(start, end, duration, clockOffset) {
+  computeStartEnd(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) {
     let se = calcStartEndDates(start, end, duration, clockOffset);
     this.startTime(se.start);
     return this.endTime(se.end);
@@ -123,10 +272,10 @@ console.log("fdsnDataSelect URL: "+url);
 
   formBaseURL() {
       let colon = ":";
-      if (this.protocol().endsWith(colon)) {
+      if (this._protocol.endsWith(colon)) {
         colon = "";
       }
-      return this.protocol()+colon+"//"+this.host()+(this._port==80?"":(":"+this._port))+"/fdsnws/dataselect/"+this.specVersion();
+      return this._protocol+colon+"//"+this._host+(this._port==80?"":(":"+this._port))+"/fdsnws/dataselect/"+this._specVersion;
   }
 
   formVersionURL() {
@@ -157,8 +306,8 @@ console.log("fdsnDataSelect URL: "+url);
     return promise;
   }
 
-  makeParam(name, val) {
-    return name+"="+encodeURIComponent(val)+"&";
+  makeParam(name :string, val :mixed) {
+    return name+"="+encodeURIComponent(stringify(val))+"&";
   }
 
   formURL() {
@@ -188,7 +337,7 @@ console.log("fdsnDataSelect URL: "+url);
 
   /** converts to ISO8601 but removes the trailing Z as FDSN web services
     do not allow that. */
-  toIsoWoZ(date) {
+  toIsoWoZ(date :moment) {
     let out = date.toISOString();
     return out.substring(0, out.length-1);
   }
@@ -196,7 +345,7 @@ console.log("fdsnDataSelect URL: "+url);
 }
 
 
-export function calcClockOffset(serverTime) {
+export function calcClockOffset(serverTime :moment) {
   return moment.utc().getTime() - serverTime.getTime();
 }
 
@@ -209,7 +358,7 @@ clockOffset is the milliseconds that should be subtracted from the local time
  or new Date().getTime() - serverDate.getTime()
  default is zero.
 */
-export function calcStartEndDates(start, end, duration, clockOffset) {
+export function calcStartEndDates(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) {
   let startDate;
   let endDate;
   if (duration &&
@@ -244,7 +393,7 @@ export function calcStartEndDates(start, end, duration, clockOffset) {
   return { "start": startDate, "end": endDate, "duration": duration, "clockOffset": clockOffset };
 }
 
-export function createDataSelectQuery(params) {
+export function createDataSelectQuery(params: Object) {
   if ( ! params || typeof params != 'object' ) {
     throw new Error("params null or not an object");
   }
