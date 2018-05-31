@@ -2,7 +2,7 @@
 
 import RSVP from 'rsvp';
 
-RSVP.on('error', function(reason) {
+RSVP.on('error', function(reason: string) {
   console.assert(false, reason);
 });
 
@@ -226,7 +226,7 @@ export class DataSelectQuery {
     }
   }
   computeStartEnd(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) {
-    let se = calcStartEndDates(start, end, duration, clockOffset);
+    let se = new StartEndDuration(start, end, duration, clockOffset);
     this.startTime(se.start);
     return this.endTime(se.end);
   }
@@ -358,42 +358,52 @@ clockOffset is the milliseconds that should be subtracted from the local time
  or new Date().getTime() - serverDate.getTime()
  default is zero.
 */
-export function calcStartEndDates(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) {
-  let startDate;
-  let endDate;
-  if (duration &&
-    (typeof duration == "string" || duration instanceof String)) {
-      duration = Number.parseFloat(duration);
-  }
-  if (duration &&
-    (typeof duration == "number" || duration instanceof Number)) {
-    duration = moment.duration(duration, 'seconds');
-  }
-  if (start && end) {
-    startDate = model.checkStringOrDate(start);
-    endDate = model.checkStringOrDate(end);
-    duration = endDate.from(startDate);
-  } else if (start && duration) {
-    startDate = model.checkStringOrDate(start);
-    endDate = moment.utc(startDate).add(duration);
-  } else if (end && duration) {
-    endDate = model.checkStringOrDate(end);
-    startDate = moment.utc(endDate).subtract(duration);
-  } else if (duration) {
-    if (clockOffset === undefined) {
-      clockOffset = moment.duration(0, 'seconds');
-    } else if (clockOffset instanceof Number) {
-      clockOffset = moment.duration(clockOffset, 'seconds');
+export class StartEndDuration {
+  start: moment;
+  end: moment;
+  duration: moment.duration;
+  clockOffset: moment.duration;
+  constructor(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) {
+
+    if (duration &&
+      (typeof duration == "string" || duration instanceof String)) {
+        this.duration = moment.duration(Number.parseFloat(duration), 'seconds');
     }
-    endDate = moment.utc().subtract(clockOffset);
-    startDate = moment.utc(endDate).subtract(duration);
-  } else {
-    throw "need some combination of start, end and duration";
+    if (duration &&
+      (typeof duration == "number" || duration instanceof Number)) {
+      this.duration = moment.duration(duration, 'seconds');
+    }
+    if (start && end) {
+      this.start = model.checkStringOrDate(start);
+      this.end = model.checkStringOrDate(end);
+      this.duration = end.from(this.start);
+    } else if (start && this.duration) {
+      this.start = model.checkStringOrDate(start);
+      this.end = moment.utc(this.start).add(this.duration);
+    } else if (end && this.duration) {
+      this.end = model.checkStringOrDate(end);
+      this.start = moment.utc(this.end).subtract(this.duration);
+    } else if (this.duration) {
+      if (clockOffset === undefined) {
+        this.clockOffset = moment.duration(0, 'seconds');
+      } else if (clockOffset instanceof Number) {
+        this.clockOffset = moment.duration(clockOffset, 'seconds');
+      } else {
+        this.clockOffset = clockOffset;
+      }
+      this.end = moment.utc().subtract(clockOffset);
+      this.start = moment.utc(this.end).subtract(this.duration);
+    } else {
+      throw "need some combination of start, end and duration";
+    }
   }
-  return { "start": startDate, "end": endDate, "duration": duration, "clockOffset": clockOffset };
 }
 
-export function createDataSelectQuery(params: Object) {
+export function calcStartEndDates(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number): StartEndDuration {
+  return new StartEndDuration(start, end, duration, clockOffset);
+}
+
+export function createDataSelectQuery(params: Object) :DataSelectQuery {
   if ( ! params || typeof params != 'object' ) {
     throw new Error("params null or not an object");
   }
