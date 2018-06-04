@@ -13,7 +13,7 @@ import * as miniseed from 'seisplotjs-miniseed';
 const model = miniseed.model;
 
 export { RSVP, model, miniseed };
-const moment = model.moment;
+import { moment } from 'seisplotjs-model';
 
 export const FORMAT_MINISEED = 'mseed';
 
