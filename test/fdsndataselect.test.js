@@ -21,8 +21,6 @@ test( "query setter test", () => {
   expect(dsQuery.locationCode()).toBe(LOC);
   expect(dsQuery.channelCode(CHAN)).toBe(dsQuery);
   expect(dsQuery.channelCode()).toBe(CHAN);
-  expect(dsQuery.channelCode(CHAN)).toBe(dsQuery);
-  expect(dsQuery.channelCode()).toBe(CHAN);
   expect(dsQuery.startTime(timeWindow.start)).toBe(dsQuery);
   expect(dsQuery.startTime()).toBe(timeWindow.start);
   expect(dsQuery.endTime(timeWindow.end)).toBe(dsQuery);
@@ -42,5 +40,14 @@ test( "query setter test", () => {
   expect(dsQuery.port(80)).toBe(dsQuery);
   expect(dsQuery.port()).toEqual(80);
   expect(dsQuery.host()).toEqual("service.iris.edu");
-  expect(dsQuery.formURL()).toBeDefined();
+  const url = dsQuery.formURL();
+  expect(url).toBeDefined();
+  // net is first, so no &
+  expect(url).toContain('?net=');
+  for(const k of ['sta', 'loc', 'cha',
+   'starttime', 'endtime',
+   'minimumlength', 'longestonly', 'quality', 'format', 'nodata']) {
+     expect(url).toContain('&'+k+'=');
+   }
+   expect(url).toContain(fdsndataselect.IRIS_HOST);
 });
