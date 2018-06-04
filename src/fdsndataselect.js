@@ -10,7 +10,7 @@ RSVP.on('error', function(reason: string) {
 import {hasArgs, hasNoArgs, isStringArg, isNumArg, checkStringOrDate, stringify} from 'seisplotjs-model';
 
 import * as miniseed from 'seisplotjs-miniseed';
-const model = miniseed.model;
+import { model } from 'seisplotjs-miniseed';
 
 export { RSVP, model, miniseed };
 import { moment } from 'seisplotjs-model';
@@ -205,6 +205,10 @@ export class DataSelectQuery {
       throw new Error('value argument is optional or boolean, but was '+typeof value);
     }
   }
+
+  /** set or get the repository paramter. This is an IRIS-specific
+  * parameter that will not work with other dataselect web services.
+  */
   repository(value?: string) :string | DataSelectQuery {
     if (isStringArg(value)) {
       this._repository = value;
@@ -225,13 +229,14 @@ export class DataSelectQuery {
       throw new Error('value argument is optional or string, but was '+value);
     }
   }
-  computeStartEnd(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) {
+  computeStartEnd(start ?:moment, end ?:moment, duration ?:number, clockOffset ?:number) :DataSelectQuery {
     let se = new StartEndDuration(start, end, duration, clockOffset);
     this.startTime(se.start);
-    return this.endTime(se.end);
+    this.endTime(se.end);
+    return this;
   }
 
-  query() {
+  query() :Promise<Array<miniseed.DataRecord>> {
     return this.queryRaw().then(function(rawBuffer) {
         let dataRecords = miniseed.parseDataRecords(rawBuffer);
         return dataRecords;
@@ -270,7 +275,7 @@ console.log("fdsnDataSelect URL: "+url);
     return promise;
   }
 
-  formBaseURL() {
+  formBaseURL() :string {
       let colon = ":";
       if (this._protocol.endsWith(colon)) {
         colon = "";
@@ -278,11 +283,11 @@ console.log("fdsnDataSelect URL: "+url);
       return this._protocol+colon+"//"+this._host+(this._port==80?"":(":"+this._port))+"/fdsnws/dataselect/"+this._specVersion;
   }
 
-  formVersionURL() {
+  formVersionURL() :string {
     return this.formBaseURL()+"/version";
   }
 
-  queryVersion() {
+  queryVersion() :Promise<string> {
     let mythis = this;
     let promise = new RSVP.Promise(function(resolve, reject) {
       let url = mythis.formVersionURL();
@@ -306,18 +311,18 @@ console.log("fdsnDataSelect URL: "+url);
     return promise;
   }
 
-  makeParam(name :string, val :mixed) {
+  makeParam(name :string, val :mixed) :string {
     return name+"="+encodeURIComponent(stringify(val))+"&";
   }
 
-  formURL() {
+  formURL() :string {
     let url = this.formBaseURL()+"/query?";
     if (this._networkCode) { url = url+this.makeParam("net", this.networkCode());}
     if (this._stationCode) { url = url+this.makeParam("sta", this.stationCode());}
     if (this._locationCode) { url = url+this.makeParam("loc", this.locationCode());}
     if (this._channelCode) { url = url+this.makeParam("cha", this.channelCode());}
-    if (this._startTime) { url = url+this.makeParam("starttime", this.toIsoWoZ(this.startTime()));}
-    if (this._endTime) { url = url+this.makeParam("endtime", this.toIsoWoZ(this.endTime()));}
+    if (this._startTime) { url = url+this.makeParam("starttime", model.toIsoWoZ(this.startTime()));}
+    if (this._endTime) { url = url+this.makeParam("endtime", model.toIsoWoZ(this.endTime()));}
     if (this._quality) { url = url+this.makeParam("quality", this.quality());}
     if (this._minimumLength) { url = url+this.makeParam("minimumlength", this.minimumLength());}
     if (this._repository) { url = url+this.makeParam("repository", this.repository());}
@@ -330,22 +335,9 @@ console.log("fdsnDataSelect URL: "+url);
     }
     return url;
   }
-
-  // these are similar methods as in seisplotjs-fdsnevent
-  // duplicate here to avoid dependency and diff NS, yes that is dumb...
-
-
-  /** converts to ISO8601 but removes the trailing Z as FDSN web services
-    do not allow that. */
-  toIsoWoZ(date :moment) {
-    let out = date.toISOString();
-    return out.substring(0, out.length-1);
-  }
-
 }
 
-
-export function calcClockOffset(serverTime :moment) {
+export function calcClockOffset(serverTime :moment) :number {
   return moment.utc().getTime() - serverTime.getTime();
 }
 
