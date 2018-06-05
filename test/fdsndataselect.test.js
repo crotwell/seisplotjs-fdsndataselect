@@ -49,5 +49,5 @@ test( "query setter test", () => {
    'minimumlength', 'longestonly', 'quality', 'format', 'nodata']) {
      expect(url).toContain('&'+k+'=');
    }
-   expect(url).toContain(fdsndataselect.IRIS_HOST);
+   expect(url).toContain("http://"+fdsndataselect.IRIS_HOST+"/fdsnws/dataselect/1/query?");
 });
