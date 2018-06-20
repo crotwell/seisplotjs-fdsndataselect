@@ -5,8 +5,8 @@
   "main": "./lib/fdsndataselect.js",
   "dependencies": {
     "rsvp": "^4.8.2",
-    "seisplotjs-model": "^1.2.0-alpha.1",
-    "seisplotjs-miniseed": "^1.2.1-alpha.1"
+    "seisplotjs-miniseed": "^1.2.1",
+    "seisplotjs-model": "^1.2.0"
   },
   "scripts": {
     "lint": "eslint 'src/*.js'",
