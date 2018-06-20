@@ -368,7 +368,7 @@ export class StartEndDuration {
     if (start && end) {
       this.start = model.checkStringOrDate(start);
       this.end = model.checkStringOrDate(end);
-      this.duration = end.from(this.start);
+      this.duration = moment.duration(this.end.diff(this.start));
     } else if (start && this.duration) {
       this.start = model.checkStringOrDate(start);
       this.end = moment.utc(this.start).add(this.duration);
