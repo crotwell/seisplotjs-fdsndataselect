@@ -3,15 +3,15 @@
 var ds = seisplotjs_fdsndataselect;
 var miniseed = ds.miniseed;
 
+//  .host('service.scedc.caltech.edu')
 var dsQuery = new ds.DataSelectQuery()
-  .host('service.scedc.caltech.edu')
   .nodata(404)
-  .networkCode('CI')
-  .stationCode('BBS')
-  .locationCode('--')
-  .channelCode('BHZ')
-  .startTime('2017-03-01T20:17:04Z')
-  .endTime('2017-03-01T20:23:04Z');
+  .networkCode('CO')
+  .stationCode('TEEBA')
+  .locationCode('00')
+  .channelCode('LHZ')
+  .startTime('2018-06-01T20:00:00Z')
+  .endTime('2018-06-01T20:10:00Z');
 
 var div = d3.select('div.miniseed');
 var divP = div.append('p');
@@ -22,7 +22,11 @@ divP.append("a")
     .text(url);
 
 dsQuery.query().then(function(records) {
-var table = d3.select("div.miniseed")
+  if (records.length == 0) {
+    d3.select("div.miniseed").append("h3").text("No Data Found");
+    return records;
+  }
+  var table = d3.select("div.miniseed")
         .select("table");
       if ( table.empty()) {
         table = d3.select("div.miniseed")
