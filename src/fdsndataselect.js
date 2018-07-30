@@ -236,13 +236,22 @@ export class DataSelectQuery {
     return this;
   }
 
+  /** @deprecated use queryDataRecords or querySeismograms instead
+   */
   query() :Promise<Array<miniseed.DataRecord>> {
+    return this.queryDataRecords();
+  }
+  queryDataRecords() :Promise<Array<miniseed.DataRecord>> {
     return this.queryRaw().then(function(rawBuffer) {
         let dataRecords = miniseed.parseDataRecords(rawBuffer);
         return dataRecords;
     });
   }
-
+  querySeismograms() :Promise<Map<string, Array<model.Seismogram>>> {
+    return this.queryDataRecords().then(dataRecords => {
+      return miniseed.mergeByChannel(dataRecords);
+    });
+  }
   queryRaw() {
     let mythis = this;
     let promise = new RSVP.Promise(function(resolve, reject) {
